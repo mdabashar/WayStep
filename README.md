@@ -30,7 +30,8 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 - JSON export/import backups (import adds copies without replacing existing trips).
 - Printable full checklist, including hidden completed steps and booking notes.
 - Web manifest and service worker for supported-browser installation and offline caching.
-- An optional Brisbane-to-Wollongong example with placeholder services; no live route or timetable data.
+- A 32-step historical Brisbane–Novotel Wollongong Northbeach–Brisbane example appears automatically for a new library. It includes flights, train changes, hotel tasks and retreat activities. Personal details and real booking references are replaced with demo placeholders. Users can edit or delete it; deleting it does not cause automatic reappearance. Existing libraries can load it using **Load a detailed example trip**.
+- Existing steps can also be deleted from their Edit dialog, with confirmation.
 
 Export backups regularly: clearing browser data removes locally saved trips. Different browsers/devices and local/hosted origins have separate storage. Use export/import to transfer plans. Imports are validated before any data is saved.
 

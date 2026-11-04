@@ -2,13 +2,14 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const element=()=>({innerHTML:'',style:{},querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){},close(){}});
 const els=new Map();const document={querySelector:s=>{if(!els.has(s))els.set(s,element());return els.get(s)},querySelectorAll:()=>[],addEventListener(){}};
 let saved=null;
-const context=vm.createContext({document,crypto:require('node:crypto').webcrypto,localStorage:{getItem:()=>null,setItem:(k,v)=>{saved=v}},navigator:{onLine:true},window:{addEventListener(){}},structuredClone,setTimeout:()=>0,clearTimeout(){},console});
+const context=vm.createContext({document,crypto:require('node:crypto').webcrypto,localStorage:{getItem:()=>JSON.stringify({trips:[]}),setItem:(k,v)=>{saved=v}},navigator:{onLine:true},window:{addEventListener(){}},structuredClone,setTimeout:()=>0,clearTimeout(){},console});
+vm.runInContext(fs.readFileSync('dist/example-plan.js','utf8'),context);
 vm.runInContext(fs.readFileSync('dist/app.js','utf8'),context);
 vm.runInContext(fs.readFileSync('dist/ai.js','utf8'),context);
 const run=s=>vm.runInContext(s,context);
-run('example()');assert.equal(JSON.parse(saved).trips[0].steps.length,5);
+run('example()');assert.equal(JSON.parse(saved).trips[0].steps.length,32);
 run('mutate(ts=>ts[0].steps[0].done=true)');assert.equal(JSON.parse(saved).trips[0].steps[0].done,true);
-run('move(trip().steps[1].id,-1)');assert.equal(JSON.parse(saved).trips[0].steps[0].mode,'flight');
+run('move(trip().steps[1].id,-1)');assert.equal(JSON.parse(saved).trips[0].steps[0].mode,'taxi');
 run('actions.duplicate(active)');assert.equal(JSON.parse(saved).trips.length,2);assert.equal(JSON.parse(saved).trips[0].steps.some(s=>s.done),false);
 run('actions.archive()');assert.equal(JSON.parse(saved).trips[1].archived,true);
 assert.equal(run('validate(JSON.parse(JSON.stringify({trips}))).length'),2);
@@ -40,5 +41,16 @@ const oldLength=run('trip().steps.length'),oldFirst=run('trip().steps[0].id');
 run('aiState.plans=parseAIPlan(aiJSON);aiState.target=active;editor.querySelector=()=>({value:"current"});actions["ai-add"]()');
 assert.equal(run('trip().steps.length'),oldLength+1);assert.equal(run('trip().steps[0].id'),oldFirst);assert.equal(run('trip().notes.includes("AI-assisted draft")'),true);
 run('actions["ai-add"]()');assert.equal(run('trip().steps.length'),oldLength+1);
+// Deletion waits for confirmation and removes only the chosen step.
+const beforeDelete=saved,deleteLength=run('trip().steps.length'),keepId=run('trip().steps[1].id');
+run('let deleteConfirmation;showDialog=(title,body,handler)=>{deleteConfirmation=handler};actions["delete-step"](trip().steps[0].id)');
+assert.equal(saved,beforeDelete);run('deleteConfirmation()');assert.equal(run('trip().steps.length'),deleteLength-1);assert.equal(run('trip().steps[0].id'),keepId);
 const before=saved;run('localStorage.setItem=()=>{throw Error("full")}; mutate(ts=>ts.length=0)');assert.equal(saved,before);assert.equal(run('trips.length'),2);
 console.log('Passed: persistence, completion, bidirectional ordering, duplication, archive, AI parsing, fenced JSON, validation, colour migration, escaping and failed-save recovery.');
+// A deleted sample stays deleted; existing libraries are not modified on startup.
+function boot(raw){let output=raw;const c=vm.createContext({document,crypto:require('node:crypto').webcrypto,localStorage:{getItem:()=>raw,setItem:(k,v)=>output=v},navigator:{onLine:true},window:{addEventListener(){}},structuredClone,setTimeout:()=>0,clearTimeout(){},console});for(const f of ['example-plan.js','app.js'])vm.runInContext(fs.readFileSync('dist/'+f,'utf8'),c);return {data:JSON.parse(output),c}}
+const fresh=boot(null);assert.equal(fresh.data.trips.length,1);assert.equal(fresh.data.trips[0].steps.length,32);assert.equal(fresh.data.trips[0].example,true);assert.equal(vm.runInContext('active',fresh.c),null);
+assert.equal(boot(JSON.stringify(fresh.data)).data.trips.length,1);
+assert.equal(boot(JSON.stringify({trips:[]})).data.trips.length,0);
+assert.equal(fresh.data.trips[0].steps.every(s=>!s.done&&(!s.booking||s.booking==='DEMO-ONLY')),true);
+console.log('Passed: automatic demo on first visit, no duplicate reseeding, deletion persistence and demo booking placeholders.');
