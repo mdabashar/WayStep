@@ -4,7 +4,7 @@ A responsive travel checklist app with no runtime dependencies. Trips are saved 
 
 ## Open the app
 
-[Launch Waystep](https://mdabashar.github.io/WayStep/). No ChatGPT account is required.
+[Launch Waystep](https://mdabashar.github.io/WayStep/).
 
 GitHub Pages publishes the `dist` folder using `.github/workflows/pages.yml`. Each push to `main` runs the app checks before deployment. You can also run the workflow manually from the repository's Actions tab. In Settings → Pages, the publishing source is GitHub Actions.
 
