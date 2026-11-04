@@ -1,0 +1,17 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const element=()=>({innerHTML:'',style:{},querySelectorAll:()=>[],addEventListener(){}});
+const els=new Map();const document={querySelector:s=>{if(!els.has(s))els.set(s,element());return els.get(s)},querySelectorAll:()=>[],addEventListener(){}};
+let saved=null;
+const context=vm.createContext({document,crypto:require('node:crypto').webcrypto,localStorage:{getItem:()=>null,setItem:(k,v)=>{saved=v}},navigator:{onLine:true},window:{addEventListener(){}},structuredClone,setTimeout:()=>0,clearTimeout(){},console});
+vm.runInContext(fs.readFileSync('dist/app.js','utf8'),context);
+const run=s=>vm.runInContext(s,context);
+run('example()');assert.equal(JSON.parse(saved).trips[0].steps.length,5);
+run('mutate(ts=>ts[0].steps[0].done=true)');assert.equal(JSON.parse(saved).trips[0].steps[0].done,true);
+run('move(trip().steps[1].id,-1)');assert.equal(JSON.parse(saved).trips[0].steps[0].mode,'flight');
+run('actions.duplicate(active)');assert.equal(JSON.parse(saved).trips.length,2);assert.equal(JSON.parse(saved).trips[0].steps.some(s=>s.done),false);
+run('actions.archive()');assert.equal(JSON.parse(saved).trips[1].archived,true);
+assert.equal(run('validate(JSON.parse(JSON.stringify({trips}))).length'),2);
+assert.throws(()=>run('validate({trips:[{title:"Broken",steps:[null]}]})'));
+context.unsafe='<script>"&';assert.equal(run('esc(unsafe)'),'&lt;script&gt;&quot;&amp;');
+const before=saved;run('localStorage.setItem=()=>{throw Error("full")}; mutate(ts=>ts.length=0)');assert.equal(saved,before);assert.equal(run('trips.length'),2);
+console.log('Passed: persistence, completion, ordering, duplication, archive, import validation, escaping and failed-save recovery.');
