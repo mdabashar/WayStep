@@ -7,6 +7,15 @@ vm.runInContext(fs.readFileSync('dist/example-plan.js','utf8'),context);
 vm.runInContext(fs.readFileSync('dist/app.js','utf8'),context);
 vm.runInContext(fs.readFileSync('dist/ai.js','utf8'),context);
 const run=s=>vm.runInContext(s,context);
+// Directions preserve both addresses and select an appropriate supported mode.
+for(const [mode,expected] of Object.entries({walk:'walking',bicycle:'bicycling',car:'driving',taxi:'driving',bus:'transit',train:'transit',ferry:'transit'})){
+  context.mapStep={mode,from:'Airport & station, Brisbane',to:'2–14 Cliff Road, Wollongong'};
+  const target=run('mapTarget(mapStep)'),url=new URL(target.url);
+  assert.equal(url.pathname,'/maps/dir/');assert.equal(url.searchParams.get('origin'),context.mapStep.from);assert.equal(url.searchParams.get('destination'),context.mapStep.to);assert.equal(url.searchParams.get('travelmode'),expected);assert.equal(url.searchParams.get('api'),'1');
+}
+for(const item of [{mode:'walk',to:'Wollongong Station'},{mode:'flight',from:'Brisbane Airport',to:'Sydney Airport'},{mode:'other',from:'Hotel',to:'Event room'},{mode:'walk',from:'Same hotel',to:'Same hotel'}]){
+  context.mapStep=item;const target=run('mapTarget(mapStep)');assert.equal(new URL(target.url).pathname,'/maps/search/');assert.equal(new URL(target.url).searchParams.get('query'),item.to);
+}
 run('example()');assert.equal(JSON.parse(saved).trips[0].steps.length,32);
 run('mutate(ts=>ts[0].steps[0].done=true)');assert.equal(JSON.parse(saved).trips[0].steps[0].done,true);
 run('move(trip().steps[1].id,-1)');assert.equal(JSON.parse(saved).trips[0].steps[0].mode,'taxi');

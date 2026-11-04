@@ -26,7 +26,7 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 - Ordered travel steps with transport, service numbers, addresses, local departure/arrival times, booking references and notes.
 - Check off steps, hide completed items, next-step highlighting and progress.
 - Completed steps automatically collapse to a compact checkbox and title. Untick to restore the full step; printed checklists still include all details.
-- Reorder with arrows or drag and drop; open destinations in Google Maps.
+- Reorder with arrows or drag and drop. **View route** opens Google Maps with the step's starting point, destination and walking, cycling, driving or public transport mode already selected. Bus, train and ferry steps request public transport options; confirm the actual service and travel date in Maps. Flights show the arrival airport, and steps without a starting point show the destination location.
 - JSON export/import backups (import adds copies without replacing existing trips).
 - Printable full checklist, including hidden completed steps and booking notes.
 - Web manifest and service worker for supported-browser installation and offline caching.
