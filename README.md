@@ -24,6 +24,7 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 - Multiple coloured trips, dates and notes; search, copy, archive and restore.
 - Ordered travel steps with transport, service numbers, addresses, local departure/arrival times, booking references and notes.
 - Check off steps, hide completed items, next-step highlighting and progress.
+- Completed steps automatically collapse to a compact checkbox and title. Untick to restore the full step; printed checklists still include all details.
 - Reorder with arrows or drag and drop; open destinations in Google Maps.
 - JSON export/import backups (import adds copies without replacing existing trips).
 - Printable full checklist, including hidden completed steps and booking notes.
