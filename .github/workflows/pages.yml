@@ -21,6 +21,7 @@ jobs:
       - name: Validate app
         run: |
           node --check dist/app.js
+          node --check dist/ai.js
           node --check dist/sw.js
           node checks.cjs
 

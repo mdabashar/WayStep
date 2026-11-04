@@ -16,6 +16,8 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 
 ## Features
 
+- Blue plane branding and a responsive, streamlined interface.
+- Plan with AI: describe the journey, copy a planning prompt into ChatGPT or another LLM, paste or load the returned JSON, review it, then add an editable trip or append steps to the current trip. No API key, automatic AI requests or backend are required.
 - Guided planning: Create trip & add steps opens the first step immediately. Save a step, then choose Add another step or Finish planning.
 - Clear Open trip buttons, a top-of-page Add travel step action, and a first-step prompt for empty trips.
 - A short step form for title, transport and destination, with optional More details for starting point, services, times, bookings and notes.
@@ -30,4 +32,10 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 
 Export backups regularly: clearing browser data removes locally saved trips. Different browsers/devices and local/hosted origins have separate storage. Use export/import to transfer plans. Imports are validated before any data is saved.
 
-Run checks with `node --check dist/app.js`, `node --check dist/sw.js` and `node checks.cjs`.
+Run checks with `node --check dist/app.js`, `node --check dist/ai.js`, `node --check dist/sw.js` and `node checks.cjs`.
+
+## AI planning format
+
+The in-app wizard generates a complete prompt with the supported fields. The AI should return a single trip object, or a `{ "trips": [...] }` wrapper, containing a title and ordered steps. Each step requires a title. Optional fields are `mode`, `from`, `to`, `service`, `departure`, `arrival`, `booking`, and `notes`. Supported modes: `walk`, `bicycle`, `car`, `taxi`, `bus`, `train`, `ferry`, `flight`, `other`. Use `YYYY-MM-DD` for trip `start`/`end` dates and `YYYY-MM-DDTHH:mm` for local departure/arrival times. Leave unknown details empty. JSON code fences are accepted.
+
+Plans are validated and previewed before saving, with a maximum of 20 trips and 200 steps per trip. Imported AI steps always start unchecked. Existing trips are never replaced by this flow. AI results are drafts; check actual services, times and addresses with the relevant operator before travelling.
