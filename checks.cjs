@@ -27,6 +27,14 @@ const beforeMove=saved;assert.equal(run('move("missing",-1)'),false);assert.equa
 assert.equal(run('move(trip().steps[0].id,-1)'),false);
 const position=run('trip().steps[0].id');context.position=position;run('move(position,1)');assert.equal(run('trip().steps[1].id'),position);run('move(position,-1)');assert.equal(run('trip().steps[0].id'),position);
 assert.equal(run('planningPrompt({origin:"Brisbane",destination:"Wollongong"}).includes("Never invent")'),true);
+// Both prompt variants retain the same importable JSON contract.
+for(const planningMode of ['standard','project']){
+  context.promptOptions={planningMode,projectContext:'Use the latest confirmed tickets.'};
+  const prompt=run('planningPrompt(promptOptions)');
+  context.promptJSON=prompt.slice(prompt.indexOf('\n{')+1);
+  assert.equal(run('parseAIPlan(promptJSON)[0].steps.length'),1);
+  assert.equal(prompt.includes('PROJECT-BASED PLANNING'),planningMode==='project');
+}
 // Appending keeps the original route, retains AI assumptions and cannot double-add.
 const oldLength=run('trip().steps.length'),oldFirst=run('trip().steps[0].id');
 run('aiState.plans=parseAIPlan(aiJSON);aiState.target=active;editor.querySelector=()=>({value:"current"});actions["ai-add"]()');

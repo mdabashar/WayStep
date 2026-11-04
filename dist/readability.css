@@ -1,4 +1,5 @@
 /* Legible at a glance: self-hosted type, strong contrast and generous targets. */
+.project-guidance[hidden]{display:none}
 @font-face{
   font-family:"Atkinson Hyperlegible Next";
   src:url("fonts/AtkinsonHyperlegibleNext.ttf") format("truetype");

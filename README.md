@@ -38,6 +38,10 @@ Run checks with `node --check dist/app.js`, `node --check dist/ai.js`, `node --c
 
 ## AI planning format
 
+Choose **Use my existing AI project** in the AI planner to generate a prompt for an AI project containing your travel files and previous planning. Route and date fields can be left blank for the AI to resolve from its available project materials. Optional project guidance can identify documents to prioritise or the scope of the trip. Paste the prompt into a chat inside that project, then bring the final JSON back to Waystep as usual.
+
+The project prompt asks the AI to reconcile bookings, identify missing or conflicting information, preserve confirmed arrangements, add transfers and arrival/check-in tasks, and cite documents in step notes. It asks for clarification when critical details are missing, rather than fabricating them. Waystep does not connect to project storage or automatically upload documents.
+
 The in-app wizard generates a complete prompt with the supported fields. The AI should return a single trip object, or a `{ "trips": [...] }` wrapper, containing a title and ordered steps. Each step requires a title. Optional fields are `mode`, `from`, `to`, `service`, `departure`, `arrival`, `booking`, and `notes`. Supported modes: `walk`, `bicycle`, `car`, `taxi`, `bus`, `train`, `ferry`, `flight`, `other`. Use `YYYY-MM-DD` for trip `start`/`end` dates and `YYYY-MM-DDTHH:mm` for local departure/arrival times. Leave unknown details empty. JSON code fences are accepted.
 
 Plans are validated and previewed before saving, with a maximum of 20 trips and 200 steps per trip. Imported AI steps always start unchecked. Existing trips are never replaced by this flow. AI results are drafts; check actual services, times and addresses with the relevant operator before travelling.
