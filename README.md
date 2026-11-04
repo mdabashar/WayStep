@@ -2,6 +2,14 @@
 
 A responsive travel checklist app with no runtime dependencies. Trips are saved in localStorage in the current browser; there is no cloud sync.
 
+## Open the app
+
+[Launch Waystep](https://mdabashar.github.io/WayStep/). No ChatGPT account is required.
+
+GitHub Pages publishes the `dist` folder using `.github/workflows/pages.yml`. Each push to `main` runs the app checks before deployment. You can also run the workflow manually from the repository's Actions tab. In Settings → Pages, the publishing source is GitHub Actions.
+
+To move plans from another hosted copy, export a JSON backup there, then import it here. Browser storage is separate for each host. The public website contains only the app; trip details remain in each visitor's browser.
+
 ## Run locally
 
 From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --directory dist`, then visit http://127.0.0.1:5173. Use an HTTP server rather than opening index.html directly so offline support works. Keep the server running for online access. After the first successful visit, the service worker caches the app for offline use. Private hosting authentication may require connectivity when entering the hosted site.
