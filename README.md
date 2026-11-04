@@ -17,6 +17,7 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 ## Features
 
 - Blue plane branding and a responsive, streamlined interface.
+- Atkinson Hyperlegible Next is self-hosted and cached for offline use, with larger journey text, explicit From/To labels, deep navy text, deep blue actions and an amber Up next marker. Main text, secondary text, button text and completed titles use colour pairs above 7:1 contrast. This is a targeted readability improvement, not a claim of complete WCAG conformance.
 - Plan with AI: describe the journey, copy a planning prompt into ChatGPT or another LLM, paste or load the returned JSON, review it, then add an editable trip or append steps to the current trip. No API key, automatic AI requests or backend are required.
 - Guided planning: Create trip & add steps opens the first step immediately. Save a step, then choose Add another step or Finish planning.
 - Clear Open trip buttons, a top-of-page Add travel step action, and a first-step prompt for empty trips.
@@ -40,3 +41,11 @@ Run checks with `node --check dist/app.js`, `node --check dist/ai.js`, `node --c
 The in-app wizard generates a complete prompt with the supported fields. The AI should return a single trip object, or a `{ "trips": [...] }` wrapper, containing a title and ordered steps. Each step requires a title. Optional fields are `mode`, `from`, `to`, `service`, `departure`, `arrival`, `booking`, and `notes`. Supported modes: `walk`, `bicycle`, `car`, `taxi`, `bus`, `train`, `ferry`, `flight`, `other`. Use `YYYY-MM-DD` for trip `start`/`end` dates and `YYYY-MM-DDTHH:mm` for local departure/arrival times. Leave unknown details empty. JSON code fences are accepted.
 
 Plans are validated and previewed before saving, with a maximum of 20 trips and 200 steps per trip. Imported AI steps always start unchecked. Existing trips are never replaced by this flow. AI results are drafts; check actual services, times and addresses with the relevant operator before travelling.
+
+## Readability references and font licence
+
+- [Braille Institute: Atkinson Hyperlegible](https://www.brailleinstitute.org/freefont/) — letterform distinction and readable typography.
+- [W3C contrast guidance](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html) — enhanced text contrast target of 7:1.
+- [Home Office typography](https://design.homeoffice.gov.uk/design-system/styles/typography) — readable type scales.
+
+Font sourced from [Google Fonts](https://github.com/google/fonts/tree/main/ofl/atkinsonhyperlegiblenext). Distributed unmodified under the SIL Open Font License; see `dist/fonts/OFL.txt`. The app makes no third-party font requests.
