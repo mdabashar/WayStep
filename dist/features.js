@@ -67,11 +67,27 @@ actions['cloud-logout'] = async () => {
 
 actions['mcp-info'] = () => {
   showDialog('Connect your AI to Waystep', `<div class="help-content">
-    <p>Add the Waystep MCP server to an AI app that supports custom remote MCP tools. Ask it to call <strong>send_trip_draft</strong>, then open the review link it returns.</p>
-    ${config.mcpUrl ? `<label class="field">MCP server URL<input value="${esc(config.mcpUrl)}" readonly></label>` : '<p>The remote MCP server address has not been configured for this site yet. You can still import a plan as JSON.</p>'}
-    <p>The review link contains the draft itinerary. Keep it private if it includes personal details. Waystep opens a preview and saves only after you approve it.</p>
+    ${config.mcpUrl ? `
+      <p>Copy this URL into an AI app that supports custom remote MCP servers. Once connected, ask it to <strong>send your trip draft to Waystep</strong>.</p>
+      <label class="field">MCP server URL<input id="mcp-server-url" value="${esc(config.mcpUrl)}" readonly></label>
+      <button class="btn primary" data-action="mcp-copy-url">Copy server URL</button>
+      <p>Open the link your AI returns to review and save the trip. Keep the link private if the itinerary includes personal details.</p>
+    ` : '<p>The MCP server URL has not been configured. You can still use <strong>Plan with AI</strong> to import an itinerary manually.</p>'}
     ${pendingDraft ? '<button class="btn primary" data-action="mcp-review">Review received draft</button>' : ''}
-    <button class="btn" data-action="ai-paste">Import JSON</button></div>`, null);
+  </div>`, null);
+};
+
+actions['mcp-copy-url'] = async () => {
+  if (!config.mcpUrl) return;
+  try {
+    await navigator.clipboard.writeText(config.mcpUrl);
+    toast('Server URL copied');
+  } catch {
+    const field = editor.querySelector('#mcp-server-url');
+    field?.focus();
+    field?.select();
+    toast('Copy the server URL from the field.');
+  }
 };
 
 actions['mcp-review'] = () => {
