@@ -18,13 +18,20 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
-      - name: Validate app
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Validate app and MCP server
         run: |
+          npm ci
           node --check dist/app.js
           node --check dist/example-plan.js
           node --check dist/ai.js
+          node --check dist/features.js
           node --check dist/sw.js
-          node checks.cjs
+          npm test
+          npm run build
 
   deploy:
     needs: validate
@@ -39,6 +46,17 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Build site
+        env:
+          WAYSTEP_FIREBASE_CONFIG: ${{ vars.WAYSTEP_FIREBASE_CONFIG }}
+          WAYSTEP_MCP_URL: ${{ vars.WAYSTEP_MCP_URL }}
+        run: |
+          npm ci
+          npm run build
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload website

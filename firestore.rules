@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/trips/{tripId} {
+      function owner() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+      function validTrip() {
+        let trip = request.resource.data;
+        return trip.keys().hasOnly(['details', 'steps', 'order', 'created'])
+          && trip.details is map && trip.details.title is string
+          && trip.details.title.size() <= 200 && trip.details.color is string
+          && trip.steps is map && trip.steps.size() <= 1000
+          && trip.order is list && trip.order.size() <= 1000
+          && trip.created is int;
+      }
+      allow read, delete: if owner();
+      allow create, update: if owner() && validTrip();
+    }
+  }
+}

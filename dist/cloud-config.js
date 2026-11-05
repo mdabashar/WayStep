@@ -1,0 +1,1 @@
+window.WAYSTEP_CONFIG = {};

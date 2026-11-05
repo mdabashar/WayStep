@@ -1,18 +1,19 @@
-# WayStep
+# Waystep
 
-A responsive travel checklist app with no runtime dependencies. Trips are saved in localStorage in the current browser; there is no cloud sync.
+A travel checklist with guest storage, optional Google sign-in and cross-device sync. Both editions share the same checklist, local library and account.
 
 ## Open the app
 
-[Launch WayStep](https://mdabashar.github.io/WayStep/).
+- [Waystep](https://mdabashar.github.io/WayStep/) has the travel checklist and AI JSON import.
+- [WaystepAI](https://mdabashar.github.io/WayStep/ai.html) adds the MCP draft handoff.
 
 GitHub Pages publishes the `dist` folder using `.github/workflows/pages.yml`. Each push to `main` runs the app checks before deployment. You can also run the workflow manually from the repository's Actions tab. In Settings → Pages, the publishing source is GitHub Actions.
 
-To move plans from another hosted copy, export a JSON backup there, then import it here. Browser storage is separate for each host. The public website contains only the app; trip details remain in each visitor's browser.
+To move plans from another hosted copy, export a JSON backup there, then import it here. Browser storage is separate for each host. Guest trips stay in the browser. After signing in, use the sync menu to copy selected guest trips into your account. Synced trips are visible on devices signed into the same Google account.
 
 ## Run locally
 
-From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --directory dist`, then visit http://127.0.0.1:5173. Use an HTTP server rather than opening index.html directly so offline support works. Keep the server running for online access. After the first successful visit, the service worker caches the app for offline use. Private hosting authentication may require connectivity when entering the hosted site.
+With Node.js 24, run `npm ci` and `npm run build`. Then run `python -m http.server 5173 --bind 127.0.0.1 --directory dist`, then visit http://127.0.0.1:5173. Use an HTTP server rather than opening index.html directly so offline support works. Keep the server running for online access. After the first successful visit, the service worker caches the app for offline use. Private hosting authentication may require connectivity when entering the hosted site.
 
 ## Features
 
@@ -33,15 +34,30 @@ From this directory, run `python -m http.server 5173 --bind 127.0.0.1 --director
 - A 32-step historical Brisbane–Novotel Wollongong Northbeach–Brisbane example appears automatically for a new library. It includes flights, train changes, hotel tasks and retreat activities. Personal details and real booking references are replaced with demo placeholders. Users can edit or delete it; deleting it does not cause automatic reappearance. Existing libraries can load it using **Load a detailed example trip**.
 - Existing steps can also be deleted from their Edit dialog, with confirmation.
 
-Export backups regularly: clearing browser data removes locally saved trips. Different browsers/devices and local/hosted origins have separate storage. Use export/import to transfer plans. Imports are validated before any data is saved.
+Export backups regularly: clearing browser data removes locally saved trips. Guest libraries are separate across devices and site origins. Use export/import to transfer guest trips, or copy them into your synced library. Imports are validated before any data is saved.
 
-Run checks with `node --check dist/app.js`, `node --check dist/ai.js`, `node --check dist/sw.js` and `node checks.cjs`.
+Run the checklist and MCP checks with `npm test`.
+
+## Enable Google sign-in and Firestore
+
+1. In a Firebase project for Waystep, register a web app, enable Google under Authentication → Sign-in method, and add the website hostname (for example, `mdabashar.github.io`) under Authentication → Authorized domains.
+2. Create a Cloud Firestore database in production mode. From this repository deploy the owner-only rules and index settings with `firebase deploy --only firestore --project YOUR_PROJECT_ID`. Use a dedicated Firebase project so these rules only apply to Waystep.
+3. In GitHub, open Settings → Secrets and variables → Actions → Variables. Set `WAYSTEP_FIREBASE_CONFIG` to the web config JSON from Firebase Project settings. It must include `apiKey`, `authDomain`, `projectId`, and `appId`. Use the public web configuration. Keep service credentials out of the build.
+4. Run the GitHub Pages workflow again. Sign into both editions and test that the same trip and checked steps appear on two devices.
+
+Guest storage works without a Firebase config. On a personal device, select **Remember me and keep synced trips offline** before sign-in to cache previously loaded trips and queue checklist changes until reconnecting. Firestore syncs changes to different step fields independently. If two devices change the same field or reorder the same trip, the last write wins. For local builds you can pass the same public config as a `WAYSTEP_FIREBASE_CONFIG` environment variable to `npm run build`.
+
+## Host the MCP server
+
+The MCP server is a small Node.js service. Run `npm start` locally or deploy the included Dockerfile to an HTTPS container host. It serves Streamable HTTP at `/mcp` and a health check at `/health`. Set `WAYSTEP_AI_URL` to your WaystepAI page if you use a different site. The default points to the published GitHub Pages edition. Add the public HTTPS MCP endpoint as the GitHub Actions variable `WAYSTEP_MCP_URL` and rerun the Pages workflow.
+
+In an AI client that supports custom remote MCP servers and a public Streamable HTTP endpoint, add that endpoint and ask the AI to call `send_trip_draft` with the finished trip. Open the review link, check the details, and choose **Add** to save it in the active library. The MCP endpoint needs no Firebase credentials or model API key. It validates the draft and returns it in a compressed URL fragment. Anyone with the link can read its contents, so keep it private. For larger drafts or AI clients that cannot open the link, use JSON import.
 
 ## AI planning format
 
-Choose **Use my existing AI project** in the AI planner to generate a prompt for an AI project containing your travel files and previous planning. Route and date fields can be left blank for the AI to resolve from its available project materials. Optional project guidance can identify documents to prioritise or the scope of the trip. Paste the prompt into a chat inside that project, then bring the final JSON back to WayStep as usual.
+Choose **Use my existing AI project** in the AI planner to generate a prompt for an AI project containing your travel files and previous planning. Route and date fields can be left blank for the AI to resolve from its available project materials. Optional project guidance can identify documents to prioritise or the scope of the trip. Paste the prompt into a chat inside that project, then bring the final JSON back to Waystep as usual.
 
-The project prompt asks the AI to reconcile bookings, identify missing or conflicting information, preserve confirmed arrangements, add transfers and arrival/check-in tasks, and cite documents in step notes. It asks for clarification when critical details are missing, rather than fabricating them. WayStep does not connect to project storage or automatically upload documents.
+The project prompt asks the AI to reconcile bookings, identify missing or conflicting information, preserve confirmed arrangements, add transfers and arrival/check-in tasks, and cite documents in step notes. It asks for clarification when critical details are missing, rather than fabricating them. Waystep does not connect to project storage or automatically upload documents.
 
 The in-app wizard generates a complete prompt with the supported fields. The AI should return a single trip object, or a `{ "trips": [...] }` wrapper, containing a title and ordered steps. Each step requires a title. Optional fields are `mode`, `from`, `to`, `service`, `departure`, `arrival`, `booking`, and `notes`. Supported modes: `walk`, `bicycle`, `car`, `taxi`, `bus`, `train`, `ferry`, `flight`, `other`. Use `YYYY-MM-DD` for trip `start`/`end` dates and `YYYY-MM-DDTHH:mm` for local departure/arrival times. Leave unknown details empty. JSON code fences are accepted.
 

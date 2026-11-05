@@ -1,0 +1,8 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {"collectionGroup": "trips", "fieldPath": "details", "indexes": []},
+    {"collectionGroup": "trips", "fieldPath": "steps", "indexes": []},
+    {"collectionGroup": "trips", "fieldPath": "order", "indexes": []}
+  ]
+}
