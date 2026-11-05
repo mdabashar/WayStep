@@ -66,13 +66,14 @@ actions['cloud-logout'] = async () => {
 };
 
 actions['mcp-info'] = () => {
-  showDialog('Connect your AI to Waystep', `<div class="help-content">
+  showDialog('Connect an AI app', `<div class="help-content">
     ${config.mcpUrl ? `
       <p>Copy this URL into an AI app that supports custom remote MCP servers. Once connected, ask it to <strong>send your trip draft to Waystep</strong>.</p>
       <label class="field">MCP server URL<input id="mcp-server-url" value="${esc(config.mcpUrl)}" readonly></label>
       <button class="btn primary" data-action="mcp-copy-url">Copy server URL</button>
       <p>Open the link your AI returns to review and save the trip. Keep the link private if the itinerary includes personal details.</p>
     ` : '<p>The MCP server URL has not been configured. You can still use <strong>Plan with AI</strong> to import an itinerary manually.</p>'}
+    <button class="text-btn" data-action="ai-options">← Back to Plan with AI</button>
     ${pendingDraft ? '<button class="btn primary" data-action="mcp-review">Review received draft</button>' : ''}
   </div>`, null);
 };

@@ -87,9 +87,20 @@ function parseAIPlan(raw){
   return clean;
 }
 
-function openAIPlanner(reset=true){
+function openAIOptions(reset=true){
   if(reset){const t=trip();aiState={planningMode:'standard',projectContext:'',origin:'',destination:t?.title||'',start:t?.start||'',preferences:t?.notes||'',prompt:'',output:'',plans:[],target:t?.id||null}}
-  showDialog('Let AI do the first draft',`<form><div class="ai-intro"><span class="ai-orb" aria-hidden="true">✦</span><p>Describe your journey once. Get a detailed plan from your favourite AI, then make it yours.</p></div><div class="flow-steps"><b>1 Describe</b><span>2 Ask your AI</span><span>3 Review & add</span></div><div class="fields"><label class="field full">Where will you plan?<select name="planningMode" id="ai-planning-mode"><option value="standard" ${aiState.planningMode!=='project'?'selected':''}>Start a new AI plan</option><option value="project" ${aiState.planningMode==='project'?'selected':''}>Use my existing AI project</option></select></label><div class="field full project-guidance" id="ai-project-guidance" ${aiState.planningMode==='project'?'':'hidden'}><p class="form-help">Paste the generated prompt inside your AI project containing your bookings, documents and earlier planning. Waystep does not connect to or read the project. Leave route fields blank if your project already contains them.</p><label class="field">Project guidance (optional)<textarea name="projectContext" maxlength="5000" placeholder="e.g. Use my flight tickets and hotel confirmations. Follow the latest itinerary. Include the return journey.">${esc(aiState.projectContext)}</textarea></label></div>${field('Starting location','origin',aiState.origin,'text',false,'required maxlength="1000" placeholder="e.g. Brisbane, Queensland"')}${field('Destination','destination',aiState.destination,'text',false,'required maxlength="1000" placeholder="e.g. Wollongong, NSW"')}${field('Travel date (optional)','start',aiState.start,'date',true)}<label class="field full">Preferences & stops along the way<textarea name="preferences" maxlength="5000" placeholder="e.g. Prefer trains, avoid early departures, visit Sydney on the way…">${esc(aiState.preferences)}</textarea></label></div><div class="form-footer"><button type="button" class="btn" data-action="ai-paste">I already have an AI plan</button><button class="btn primary" type="submit">Create planning prompt →</button></div><p class="form-help">Uses ChatGPT or any other LLM through copy and paste. No API key required.</p></form>`,f=>{
+  showDialog('Plan with AI',`<div class="help-content">
+    <p>Describe your trip or use an existing AI project. Waystep will prepare a prompt to copy into your AI app.</p>
+    <button class="btn primary" data-action="ai-describe">Create a planning prompt</button>
+    <p>Already have an itinerary as JSON? Paste it or load the file to preview it.</p>
+    <button class="btn" data-action="ai-paste">Import an existing plan</button>
+    <p class="form-help">Set up direct draft handoff from a compatible AI app.</p>
+    <button class="text-btn" data-action="mcp-info">Connect an AI app</button>
+  </div>`,null);
+}
+
+function openAIPlanner(){
+  showDialog('Create a planning prompt',`<form><div class="ai-intro"><span class="ai-orb" aria-hidden="true">✦</span><p>Describe your journey once. Get a detailed plan from your favourite AI, then make it yours.</p></div><div class="flow-steps"><b>1 Describe</b><span>2 Ask your AI</span><span>3 Review & add</span></div><div class="fields"><label class="field full">Where will you plan?<select name="planningMode" id="ai-planning-mode"><option value="standard" ${aiState.planningMode!=='project'?'selected':''}>Start a new AI plan</option><option value="project" ${aiState.planningMode==='project'?'selected':''}>Use my existing AI project</option></select></label><div class="field full project-guidance" id="ai-project-guidance" ${aiState.planningMode==='project'?'':'hidden'}><p class="form-help">Paste the generated prompt inside your AI project containing your bookings, documents and earlier planning. Waystep does not connect to or read the project. Leave route fields blank if your project already contains them.</p><label class="field">Project guidance (optional)<textarea name="projectContext" maxlength="5000" placeholder="e.g. Use my flight tickets and hotel confirmations. Follow the latest itinerary. Include the return journey.">${esc(aiState.projectContext)}</textarea></label></div>${field('Starting location','origin',aiState.origin,'text',false,'required maxlength="1000" placeholder="e.g. Brisbane, Queensland"')}${field('Destination','destination',aiState.destination,'text',false,'required maxlength="1000" placeholder="e.g. Wollongong, NSW"')}${field('Travel date (optional)','start',aiState.start,'date',true)}<label class="field full">Preferences & stops along the way<textarea name="preferences" maxlength="5000" placeholder="e.g. Prefer trains, avoid early departures, visit Sydney on the way…">${esc(aiState.preferences)}</textarea></label></div><div class="form-footer"><button type="button" class="btn" data-action="ai-options">← Back</button><button class="btn primary" type="submit">Create planning prompt →</button></div><p class="form-help">Uses ChatGPT or any other LLM through copy and paste. No API key required.</p></form>`,f=>{
     Object.assign(aiState,Object.fromEntries(f));aiState.prompt=planningPrompt(aiState);showAIPrompt();
   });
   const mode=editor.querySelector('#ai-planning-mode');
@@ -106,7 +117,7 @@ function showAIPrompt(){
 }
 
 function showAIPaste(){
-  showDialog('Bring your plan into Waystep',`<form><div class="flow-steps"><span>1 Describe</span><span>2 Ask your AI</span><b>3 Review & add</b></div><p class="editor-intro">Paste the JSON plan returned by your AI, or load its JSON file. You’ll review it before anything is added.</p><label class="field">AI-generated plan<textarea name="plan" id="ai-output" autocapitalize="none" autocorrect="off" spellcheck="false" class="code-input" rows="10" required placeholder='{"title":"Brisbane → Wollongong","steps":[…]}'>${esc(aiState.output)}</textarea></label><div class="actions" style="margin-top:12px"><label class="btn file-label">Load JSON file<input type="file" id="ai-file" accept="application/json,.json" hidden></label><button class="btn" type="button" data-action="ai-example">Try a sample plan</button></div><p id="ai-error" class="form-error" role="alert"></p><div class="form-footer"><button class="btn" type="button" data-action="ai-describe">← Back</button><button class="btn primary" type="submit">Preview plan →</button></div></form>`,f=>{
+  showDialog('Import an existing plan',`<form><p class="editor-intro">Paste the JSON plan returned by your AI, or load its JSON file. You’ll review it before anything is added.</p><label class="field">AI-generated plan<textarea name="plan" id="ai-output" autocapitalize="none" autocorrect="off" spellcheck="false" class="code-input" rows="10" required placeholder='{"title":"Brisbane → Wollongong","steps":[…]}'>${esc(aiState.output)}</textarea></label><div class="actions" style="margin-top:12px"><label class="btn file-label">Load JSON file<input type="file" id="ai-file" accept="application/json,.json" hidden></label><button class="btn" type="button" data-action="ai-example">Try a sample plan</button></div><p id="ai-error" class="form-error" role="alert"></p><div class="form-footer"><button class="btn" type="button" data-action="${aiState.prompt?'ai-prompt':'ai-options'}">← Back</button><button class="btn primary" type="submit">Preview plan →</button></div></form>`,f=>{
     aiState.output=f.get('plan');
     try{aiState.plans=parseAIPlan(aiState.output);showAIReview()}catch(err){editor.querySelector('#ai-error').textContent=err.message}
   });
@@ -124,8 +135,10 @@ function showAIReview(){
 }
 
 Object.assign(actions,{
-  'ai-plan':()=>openAIPlanner(),
-  'ai-describe':()=>openAIPlanner(false),
+  'ai-plan':()=>openAIOptions(),
+  'ai-options':()=>openAIOptions(false),
+  'ai-describe':()=>openAIPlanner(),
+  'ai-prompt':()=>showAIPrompt(),
   'ai-paste':()=>showAIPaste(),
   'ai-copy':async()=>{
     const input=editor.querySelector('#ai-prompt');input?.select();
