@@ -21,17 +21,17 @@
   background:#f4f6fa;
 }
 body{background:#f4f6fa;color:var(--ink)}
-h1,h2,h3,.big-progress{font-family:var(--reading-font);color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
+h1,h2,h3{font-family:var(--reading-font);color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
 h1{font-weight:750;letter-spacing:-.5px;line-height:1.15;font-size:42px}
 h2{font-size:23px;letter-spacing:0;font-weight:700}
 .brand{color:var(--ink);font-size:29px;letter-spacing:-.4px}
 .sidebar{background:#eaf0f8;border-color:#cbd5e1}
 .tagline,.local-note,.topbar,.eyebrow,.pill,.cover-label,.date,.trip-notes,.trip-footer,
 .back,.trip-meta,.toggle,.step-number,.step-mode,.step-details,.route .dot,
-.step summary,.summary-card p,.empty,.field,.form-help,.drag-hint,
+.step summary,.empty,.field,.form-help,.drag-hint,
 .editor-intro,.ai-intro p,.flow-steps,.ai-preview li span,.ai-notes,
 .tip,.tip strong,.ai-banner p{color:var(--muted)}
-.sub,.summary-card .next-preview,.ai-preview li strong{color:var(--ink)}
+.sub,.ai-preview li strong{color:var(--ink)}
 .eyebrow,.cover-label,.step-number,.next-label{font-size:12px;letter-spacing:1px;font-weight:700}
 .tagline,.local-note,.topbar,.pill,.form-help,.flow-steps{font-size:14px;line-height:1.5}
 .pill{background:#fff;border-color:#b4c1d3}
@@ -61,11 +61,7 @@ input::placeholder,textarea::placeholder{color:#526176;opacity:1}
 .ai-banner{background:#e8f0fc;border-color:#bacde7}
 .ai-banner h2{font-size:24px;color:var(--ink);letter-spacing:0}
 .text-btn{color:var(--accent);font-weight:700}
-.summary-card{background:#eaf0f8;border-color:#b8c8df}
-.summary-card h3{font-size:18px;color:var(--ink)}
-.big-progress{font-size:38px;font-weight:700}
-.next-preview{font-size:18px;font-weight:650;border-color:#aebfd7}
-.next-preview p{font-size:16px;font-weight:500}
+
 .progress{background:#cbd5e1}
 .progress span{background:#174ea6}
 .journey-head{gap:15px}
@@ -120,7 +116,7 @@ a{color:#174ea6}
   .pill{font-size:13px;white-space:nowrap}.ai-banner{padding:22px}.ai-banner h2{font-size:23px;max-width:100%}
   .step{padding:18px}.step-details{margin-left:0}.step-actions{margin-left:0;gap:8px}.move-btn{min-width:108px}
   .trip-footer{align-items:flex-start;flex-wrap:wrap}.trip-footer .icon-btn{font-size:16px}
-  .journey-head{align-items:flex-start}.summary-card{padding:20px}.summary-card .big-progress{font-size:34px}
+  .journey-head{align-items:flex-start}
   .field input,.field select,.field textarea{font-size:17px}.flow-steps{font-size:14px}
   .drag-hint{display:block}.new-card span{line-height:1.5}
 }
