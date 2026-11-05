@@ -44,11 +44,25 @@ Transport mode must be one of: walk, bicycle, car, taxi, bus, train, ferry, flig
 }`;
 }
 
+function normalizePlanJSON(input){
+  // Match complete strings first, so formatting inside valid strings is preserved.
+  return input.replace(/"(?:\\[\s\S]|[^"\\])*"|“(?:\\[\s\S]|[^”\\])*”|[\u00a0\u202f\u200b\u2060\ufeff]/g,token=>{
+    if(token.startsWith('"'))return token;
+    if(token.startsWith('“')){
+      const content=token.slice(1,-1).replace(/\\[\s\S]|"/g,char=>char==='"'?'\\"':char);
+      return `"${content}"`;
+    }
+    return token==='\u00a0'||token==='\u202f'?' ':'';
+  });
+}
+
 function parseAIPlan(raw){
   if(typeof raw!=='string'||raw.length>1000000)throw Error('Paste a plan smaller than 1 MB.');
-  let input=raw.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+  const text=raw.trim();
+  const blocks=[...text.matchAll(/^[ \t]*```(?:json)?[ \t]*\r?\n([\s\S]*?)^[ \t]*```[ \t]*\r?$/gim)];
+  const input=blocks.length===1?blocks[0][1]:text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
   let data;
-  try{data=JSON.parse(input)}catch{throw Error('The plan is not valid JSON. Ask your AI to return only the JSON object, then paste it here.');}
+  try{data=JSON.parse(normalizePlanJSON(input))}catch{throw Error('Waystep couldn’t read the JSON plan. Use Copy code on the full JSON block in your AI app, or choose Load JSON file.');}
   const items=Array.isArray(data?.trips)?data.trips:[data];
   if(!items.length||items.length>20)throw Error('Include between 1 and 20 trips.');
   const validDate=v=>{
@@ -92,7 +106,7 @@ function showAIPrompt(){
 }
 
 function showAIPaste(){
-  showDialog('Bring your plan into Waystep',`<form><div class="flow-steps"><span>1 Describe</span><span>2 Ask your AI</span><b>3 Review & add</b></div><p class="editor-intro">Paste the JSON plan returned by your AI, or load its JSON file. You’ll review it before anything is added.</p><label class="field">AI-generated plan<textarea name="plan" id="ai-output" class="code-input" rows="10" required placeholder='{"title":"Brisbane → Wollongong","steps":[…]}'>${esc(aiState.output)}</textarea></label><div class="actions" style="margin-top:12px"><label class="btn file-label">Load JSON file<input type="file" id="ai-file" accept="application/json,.json" hidden></label><button class="btn" type="button" data-action="ai-example">Try a sample plan</button></div><p id="ai-error" class="form-error" role="alert"></p><div class="form-footer"><button class="btn" type="button" data-action="ai-describe">← Back</button><button class="btn primary" type="submit">Preview plan →</button></div></form>`,f=>{
+  showDialog('Bring your plan into Waystep',`<form><div class="flow-steps"><span>1 Describe</span><span>2 Ask your AI</span><b>3 Review & add</b></div><p class="editor-intro">Paste the JSON plan returned by your AI, or load its JSON file. You’ll review it before anything is added.</p><label class="field">AI-generated plan<textarea name="plan" id="ai-output" autocapitalize="none" autocorrect="off" spellcheck="false" class="code-input" rows="10" required placeholder='{"title":"Brisbane → Wollongong","steps":[…]}'>${esc(aiState.output)}</textarea></label><div class="actions" style="margin-top:12px"><label class="btn file-label">Load JSON file<input type="file" id="ai-file" accept="application/json,.json" hidden></label><button class="btn" type="button" data-action="ai-example">Try a sample plan</button></div><p id="ai-error" class="form-error" role="alert"></p><div class="form-footer"><button class="btn" type="button" data-action="ai-describe">← Back</button><button class="btn primary" type="submit">Preview plan →</button></div></form>`,f=>{
     aiState.output=f.get('plan');
     try{aiState.plans=parseAIPlan(aiState.output);showAIReview()}catch(err){editor.querySelector('#ai-error').textContent=err.message}
   });

@@ -30,6 +30,13 @@ context.aiJSON=JSON.stringify({title:'AI journey',start:'2026-11-05',steps:[{tit
 assert.equal(run('parseAIPlan(aiJSON)[0].steps[0].done'),false);
 assert.equal(saved,beforeAI);
 context.fenced='```json\n'+context.aiJSON+'\n```';assert.equal(run('parseAIPlan(fenced).length'),1);
+context.mobilePaste='Here is your itinerary.\r\n```json\r\n\u200b{“title”:\u00a0“Brisbane trip”,“steps”:[{“title”:“Take the train”,"notes":"Keep “this text” and a\u00a0space."}]}\r\n```\r\nSafe travels!';
+assert.equal(run('parseAIPlan(mobilePaste)[0].title'),'Brisbane trip');
+assert.equal(run('parseAIPlan(mobilePaste)[0].steps[0].notes'),'Keep “this text” and a\u00a0space.');
+context.incomplete=context.aiJSON.slice(0,-2);
+assert.throws(()=>run('parseAIPlan(incomplete)'),/Copy code/);
+context.ambiguous=context.fenced+'\n\n'+context.fenced;
+assert.throws(()=>run('parseAIPlan(ambiguous)'),/Copy code/);
 context.wrapper=JSON.stringify({trips:[JSON.parse(context.aiJSON)]});assert.equal(run('parseAIPlan(wrapper)[0].title'),'AI journey');
 for(const bad of ['{}','{"title":"Missing steps","steps":[]}',JSON.stringify({title:'Bad mode',steps:[{title:'Go',mode:'spaceship'}]}),JSON.stringify({title:'Bad date',start:'2026-02-30',steps:[{title:'Go'}]}),JSON.stringify({title:'Bad time',steps:[{title:'Go',departure:'2026-11-05T29:00'}]})]){context.bad=bad;assert.throws(()=>run('parseAIPlan(bad)'))}
 assert.equal(run('validate({trips:[{title:"Old trip",color:"#dce6d0",steps:[]} ]})[0].color'),'#dbeafe');
