@@ -50,6 +50,8 @@ Guest storage works without a Firebase config. On a personal device, select **Re
 
 The MCP server is a small Node.js service. Run `npm start` locally or deploy the included Dockerfile to an HTTPS container host. It serves Streamable HTTP at `/mcp` and a health check at `/health`. Set `WAYSTEP_AI_URL` to your Waystep page if you use a different site. The default points to the published Waystep site. Add the public HTTPS MCP endpoint as the GitHub Actions variable `WAYSTEP_MCP_URL` and rerun the Pages workflow.
 
+To host on Cloudflare Workers, run `npm ci`, `npx wrangler login`, then `npx wrangler deploy`. The Worker uses the published Waystep site for review links. Run `node mcp/checks.mjs https://YOUR-WORKER.workers.dev/mcp` to verify the deployed server before publishing its URL in Waystep.
+
 In an AI client that supports custom remote MCP servers and a public Streamable HTTP endpoint, add that endpoint and ask the AI to call `send_trip_draft` with the finished trip. Open the review link, check the details, and choose **Add** to save it in the active library. The MCP endpoint needs no Firebase credentials or model API key. It validates the draft and returns it in a compressed URL fragment. Anyone with the link can read its contents, so keep it private. For larger drafts or AI clients that cannot open the link, use JSON import.
 
 ## AI planning format

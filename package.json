@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "esbuild": "0.28.2",
-    "firebase": "13.2.0"
+    "firebase": "13.2.0",
+    "wrangler": "4.158.0"
   },
   "private": true,
   "overrides": {

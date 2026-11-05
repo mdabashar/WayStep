@@ -5,11 +5,13 @@ import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import {createApp} from './server.mjs';
 
-const server = createApp('https://mdabashar.github.io/WayStep/').listen(0, '127.0.0.1');
-await once(server, 'listening');
-const endpoint = new URL('http://127.0.0.1:' + server.address().port + '/mcp');
+const external = process.argv[2];
+const server = external ? null : createApp('https://mdabashar.github.io/WayStep/').listen(0, '127.0.0.1');
+if (server) await once(server, 'listening');
+const endpoint = new URL(external || 'http://127.0.0.1:' + server.address().port + '/mcp');
 const client = new Client({name: 'Waystep test', version: '1.0.0'});
 try {
+  assert.equal(await (await fetch(new URL('/health', endpoint))).text(), 'OK');
   await client.connect(new StreamableHTTPClientTransport(endpoint));
   assert.equal((await client.listTools()).tools[0].name, 'send_trip_draft');
   const trip = {title: 'Brisbane → Sydney', steps: [{title: 'Catch the train', mode: 'train', departure: '2026-11-08T14:00', notes: 'Bring a book.'}]};
@@ -23,8 +25,11 @@ try {
   assert.equal(invalid.isError, true);
   assert.equal((await fetch(endpoint, {method: 'POST', headers: {Origin: 'https://another-site.example'}})).status, 403);
   assert.equal((await fetch(endpoint)).status, 405);
+  if (external) {
+    assert.equal((await fetch(endpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: ' '.repeat(256 * 1024 + 1)})).status, 413);
+  }
   console.log('Passed: remote MCP discovery, draft handoff, validation, and HTTP origin handling.');
 } finally {
   await client.close();
-  server.close();
+  server?.close();
 }
