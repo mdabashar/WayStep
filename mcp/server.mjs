@@ -32,10 +32,10 @@ export function createApp(reviewPage) {
     next();
   }, express.json({limit: '256kb'}));
   app.post('/mcp', async (req, res) => {
-    const server = new McpServer({name: 'WaystepAI', version: '1.0.0'});
+    const server = new McpServer({name: 'Waystep', version: '1.0.0'});
     server.registerTool('send_trip_draft', {
-      title: 'Send draft to WaystepAI',
-      description: 'Create a review link for a trip you planned in this chat. The link contains the draft. Present it unchanged to the user. They can review and save it in WaystepAI. Omit unknown times and never guess booking codes.',
+      title: 'Send draft to Waystep',
+      description: 'Create a review link for a trip you planned in this chat. The link contains the draft. Present it unchanged to the user. They can review and save it in Waystep. Omit unknown times and never guess booking codes.',
       inputSchema: {trip: draft},
       annotations: {readOnlyHint: true, idempotentHint: true, openWorldHint: true}
     }, ({trip}) => {
@@ -46,8 +46,8 @@ export function createApp(reviewPage) {
       const url = new URL(review);
       url.hash = 'draft=' + encoded;
       return {content: [
-        {type: 'text', text: 'Show the user this exact link. It contains their draft. [Review your draft in WaystepAI](' + url.href + ')'},
-        {type: 'resource_link', uri: url.href, name: 'Review your draft in WaystepAI'}
+        {type: 'text', text: 'Show the user this exact link. It contains their draft. [Review your draft in Waystep](' + url.href + ')'},
+        {type: 'resource_link', uri: url.href, name: 'Review your draft in Waystep'}
       ]};
     });
     const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined, enableJsonResponse: true});
@@ -63,6 +63,6 @@ export function createApp(reviewPage) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const page = process.env.WAYSTEP_AI_URL || 'https://mdabashar.github.io/WayStep/ai.html';
+  const page = process.env.WAYSTEP_AI_URL || 'https://mdabashar.github.io/WayStep/';
   createApp(page).listen(Number(process.env.PORT || 8080), '0.0.0.0');
 }

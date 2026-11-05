@@ -1,11 +1,10 @@
 # Waystep
 
-A travel checklist with guest storage, optional Google sign-in and cross-device sync. Both editions share the same checklist, local library and account.
+A travel checklist with guest storage, optional Google sign-in and cross-device sync.
 
 ## Open the app
 
 - [Waystep](https://mdabashar.github.io/WayStep/) has the travel checklist and AI JSON import.
-- [WaystepAI](https://mdabashar.github.io/WayStep/ai.html) adds the MCP draft handoff.
 
 GitHub Pages publishes the `dist` folder using `.github/workflows/pages.yml`. Each push to `main` runs the app checks before deployment. You can also run the workflow manually from the repository's Actions tab. In Settings → Pages, the publishing source is GitHub Actions.
 
@@ -43,13 +42,13 @@ Run the checklist and MCP checks with `npm test`.
 1. In a Firebase project for Waystep, register a web app, enable Google under Authentication → Sign-in method, and add the website hostname (for example, `mdabashar.github.io`) under Authentication → Authorized domains.
 2. Create a Cloud Firestore database in production mode. From this repository deploy the owner-only rules and index settings with `firebase deploy --only firestore --project YOUR_PROJECT_ID`. Use a dedicated Firebase project so these rules only apply to Waystep.
 3. In GitHub, open Settings → Secrets and variables → Actions → Variables. Set `WAYSTEP_FIREBASE_CONFIG` to the web config JSON from Firebase Project settings. It must include `apiKey`, `authDomain`, `projectId`, and `appId`. Use the public web configuration. Keep service credentials out of the build.
-4. Run the GitHub Pages workflow again. Sign into both editions and test that the same trip and checked steps appear on two devices.
+4. Run the GitHub Pages workflow again. Sign into Waystep and test that the same trip and checked steps appear on two devices.
 
 Guest storage works without a Firebase config. On a personal device, select **Remember me and keep synced trips offline** before sign-in to cache previously loaded trips and queue checklist changes until reconnecting. Firestore syncs changes to different step fields independently. If two devices change the same field or reorder the same trip, the last write wins. For local builds you can pass the same public config as a `WAYSTEP_FIREBASE_CONFIG` environment variable to `npm run build`.
 
 ## Host the MCP server
 
-The MCP server is a small Node.js service. Run `npm start` locally or deploy the included Dockerfile to an HTTPS container host. It serves Streamable HTTP at `/mcp` and a health check at `/health`. Set `WAYSTEP_AI_URL` to your WaystepAI page if you use a different site. The default points to the published GitHub Pages edition. Add the public HTTPS MCP endpoint as the GitHub Actions variable `WAYSTEP_MCP_URL` and rerun the Pages workflow.
+The MCP server is a small Node.js service. Run `npm start` locally or deploy the included Dockerfile to an HTTPS container host. It serves Streamable HTTP at `/mcp` and a health check at `/health`. Set `WAYSTEP_AI_URL` to your Waystep page if you use a different site. The default points to the published Waystep site. Add the public HTTPS MCP endpoint as the GitHub Actions variable `WAYSTEP_MCP_URL` and rerun the Pages workflow.
 
 In an AI client that supports custom remote MCP servers and a public Streamable HTTP endpoint, add that endpoint and ask the AI to call `send_trip_draft` with the finished trip. Open the review link, check the details, and choose **Add** to save it in the active library. The MCP endpoint needs no Firebase credentials or model API key. It validates the draft and returns it in a compressed URL fragment. Anyone with the link can read its contents, so keep it private. For larger drafts or AI clients that cannot open the link, use JSON import.
 

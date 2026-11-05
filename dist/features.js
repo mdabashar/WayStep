@@ -1,4 +1,4 @@
-/* Account controls and the WaystepAI draft handoff. */
+/* Account controls and the Waystep draft handoff. */
 const config = window.WAYSTEP_CONFIG || {};
 let accountStarting = Boolean(config.firebase?.apiKey);
 let pendingDraft;
@@ -66,10 +66,10 @@ actions['cloud-logout'] = async () => {
 };
 
 actions['mcp-info'] = () => {
-  showDialog('Connect your AI to WaystepAI', `<div class="help-content">
-    <p>Add the WaystepAI MCP server to an AI app that supports custom remote MCP tools. Ask it to call <strong>send_trip_draft</strong>, then open the review link it returns.</p>
+  showDialog('Connect your AI to Waystep', `<div class="help-content">
+    <p>Add the Waystep MCP server to an AI app that supports custom remote MCP tools. Ask it to call <strong>send_trip_draft</strong>, then open the review link it returns.</p>
     ${config.mcpUrl ? `<label class="field">MCP server URL<input value="${esc(config.mcpUrl)}" readonly></label>` : '<p>The remote MCP server address has not been configured for this site yet. You can still import a plan as JSON.</p>'}
-    <p>The review link contains the draft itinerary. Keep it private if it includes personal details. WaystepAI opens a preview and saves only after you approve it.</p>
+    <p>The review link contains the draft itinerary. Keep it private if it includes personal details. Waystep opens a preview and saves only after you approve it.</p>
     ${pendingDraft ? '<button class="btn primary" data-action="mcp-review">Review received draft</button>' : ''}
     <button class="btn" data-action="ai-paste">Import JSON</button></div>`, null);
 };
@@ -97,7 +97,7 @@ actions['ai-add'] = () => {
 
 async function readDraft() {
   const prefix = '#draft=';
-  if (edition !== 'WaystepAI' || !location.hash.startsWith(prefix)) return;
+  if (!location.hash.startsWith(prefix)) return;
   const encoded = location.hash.slice(prefix.length);
   history.replaceState(null, '', location.pathname + location.search);
   try {

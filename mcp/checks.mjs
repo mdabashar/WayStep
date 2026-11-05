@@ -5,7 +5,7 @@ import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StreamableHTTPClientTransport} from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import {createApp} from './server.mjs';
 
-const server = createApp('https://mdabashar.github.io/WayStep/ai.html').listen(0, '127.0.0.1');
+const server = createApp('https://mdabashar.github.io/WayStep/').listen(0, '127.0.0.1');
 await once(server, 'listening');
 const endpoint = new URL('http://127.0.0.1:' + server.address().port + '/mcp');
 const client = new Client({name: 'Waystep test', version: '1.0.0'});
@@ -16,7 +16,7 @@ try {
   const result = await client.callTool({name: 'send_trip_draft', arguments: {trip}});
   assert.ok(!result.isError, JSON.stringify(result));
   const review = new URL(result.content.find(item => item.type === 'resource_link').uri);
-  assert.equal(review.pathname, '/WayStep/ai.html');
+  assert.equal(review.pathname, '/WayStep/');
   assert.equal(review.search, '');
   assert.deepEqual(JSON.parse(gunzipSync(Buffer.from(review.hash.slice('#draft='.length), 'base64url'))), trip);
   const invalid = await client.callTool({name: 'send_trip_draft', arguments: {trip: {...trip, steps: []}}});

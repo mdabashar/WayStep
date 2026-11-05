@@ -124,9 +124,6 @@ a{color:#174ea6}
   body{background:white}.step.next{border:1px solid #555}.next-label{background:none;color:#111}
   .step.done .step-name{font-size:18px;color:#13253f}.step{box-shadow:none}
 }
-.account-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.account-tools a { text-decoration: none; }
-.side-bottom .account-tools { margin-top: 8px; }
 .mobile-account { display: none; }
 @media (max-width: 700px) {
   .mobile-account { display: block; margin-top: 14px; }
