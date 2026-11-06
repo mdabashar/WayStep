@@ -18,7 +18,7 @@ With Node.js 24, run `npm ci` and `npm run build`. Then run `python -m http.serv
 
 - Blue plane branding and a responsive, streamlined interface.
 - Atkinson Hyperlegible Next is self-hosted and cached for offline use, with larger journey text, explicit From/To labels, deep navy text, deep blue actions and an amber Up next marker. Main text, secondary text, button text and completed titles use colour pairs above 7:1 contrast. This is a targeted readability improvement, not a claim of complete WCAG conformance.
-- Plan with AI: describe the journey, copy a planning prompt into ChatGPT or another LLM, paste or load the returned JSON, review it, then add an editable trip or append steps to the current trip. No API key, automatic AI requests or backend are required.
+- Plan with AI: connect a compatible AI app to send a draft, or paste or load an existing JSON itinerary. Review the draft before saving.
 - Guided planning: Create trip & add steps opens the first step immediately. Save a step, then choose Add another step or Finish planning.
 - Clear Open trip buttons, a top-of-page Add travel step action, and a first-step prompt for empty trips.
 - A short step form for title, transport and destination, with optional More details for starting point, services, times, bookings and notes.
@@ -56,11 +56,7 @@ In an AI client that supports custom remote MCP servers and a public Streamable 
 
 ## AI planning format
 
-Choose **Use my existing AI project** in the AI planner to generate a prompt for an AI project containing your travel files and previous planning. Route and date fields can be left blank for the AI to resolve from its available project materials. Optional project guidance can identify documents to prioritise or the scope of the trip. Paste the prompt into a chat inside that project, then bring the final JSON back to Waystep as usual.
-
-The project prompt asks the AI to reconcile bookings, identify missing or conflicting information, preserve confirmed arrangements, add transfers and arrival/check-in tasks, and cite documents in step notes. It asks for clarification when critical details are missing, rather than fabricating them. Waystep does not connect to project storage or automatically upload documents.
-
-The in-app wizard generates a complete prompt with the supported fields. The AI should return a single trip object, or a `{ "trips": [...] }` wrapper, containing a title and ordered steps. Each step requires a title. Optional fields are `mode`, `from`, `to`, `service`, `departure`, `arrival`, `booking`, and `notes`. Supported modes: `walk`, `bicycle`, `car`, `taxi`, `bus`, `train`, `ferry`, `flight`, `other`. Use `YYYY-MM-DD` for trip `start`/`end` dates and `YYYY-MM-DDTHH:mm` for local departure/arrival times. Leave unknown details empty. JSON code fences are accepted.
+For manual import, use a single trip object, or a `{ "trips": [...] }` wrapper, containing a title and ordered steps. Each step requires a title. Optional fields are `mode`, `from`, `to`, `service`, `departure`, `arrival`, `booking`, and `notes`. Supported modes: `walk`, `bicycle`, `car`, `taxi`, `bus`, `train`, `ferry`, `flight`, `other`. Use `YYYY-MM-DD` for trip `start`/`end` dates and `YYYY-MM-DDTHH:mm` for local departure/arrival times. Leave unknown details empty. JSON code fences are accepted.
 
 Plans are validated and previewed before saving, with a maximum of 20 trips and 200 steps per trip. Imported AI steps always start unchecked. Existing trips are never replaced by this flow. AI results are drafts; check actual services, times and addresses with the relevant operator before travelling.
 
